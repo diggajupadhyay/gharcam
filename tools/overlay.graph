@@ -1,0 +1,1 @@
+[0:v]drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='%{localtime\:%Y-%m-%d %H\:%M\:%S}':x=10:y=10:fontsize=20:fontcolor=white:box=1:boxcolor=black@0.55:boxborderw=6,drawtext=fontfile=/usr/share/fonts/truetype/dejavu/DejaVuSans-Bold.ttf:text='gharcam':x=w-tw-10:y=10:fontsize=20:fontcolor=yellow:box=1:boxcolor=black@0.55:boxborderw=6[v]
