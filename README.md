@@ -56,7 +56,7 @@ Then `docker compose up -d --force-recreate capture`.
 
 | Service | Image | Role |
 |---|---|---|
-| `mediamtx` | `bluenviron/mediamtx:v1.21.0` | RTSP/HLS/WebRTC server + recorder |
+| `mediamtx` | `bluenviron/mediamtx:1.21.0` | RTSP/HLS/WebRTC server + recorder |
 | `capture` | `ghcr.io/linuxserver/ffmpeg` | V4L2 → H.264 with `drawtext` overlay → RTSP |
 
 Recordings land in `./data/recordings/` as 1-hour fMP4 segments.

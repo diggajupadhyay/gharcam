@@ -2,7 +2,7 @@ name: gharcam
 
 services:
   mediamtx:
-    image: bluenviron/mediamtx:v1.21.0
+    image: bluenviron/mediamtx:1.21.0
     container_name: gharcam-mediamtx
     user: "1000:1000"
     restart: unless-stopped
