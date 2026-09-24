@@ -6,21 +6,16 @@ services:
     container_name: gharcam-mediamtx
     user: "1000:1000"
     restart: unless-stopped
+    # Host network: required for WebRTC ICE (browser must reach UDP 8189 on
+    # the host LAN IP; Docker bridge would advertise unreachable 172.x candidates).
+    network_mode: host
     environment:
-      - TZ=Etc/UTC
-    ports:
-      # RTSP protocol (VLC, ffplay, Home Assistant, etc.)
-      - "8554:8554/tcp"
-      # HLS over HTTP (browsers, mobile apps)
-      - "8888:8888/tcp"
-      # WebRTC media + player page (fastest browser latency)
-      - "8889:8889/tcp"
-      - "8189:8189/udp"
+      - TZ=${TZ:-UTC}
+      # Recording segment length (each fMP4 file) — set RECORD_SEGMENT_DURATION in .env
+      - MTX_PATHS_CAM_RECORDSEGMENTDURATION=${RECORD_SEGMENT_DURATION:-1h}
     volumes:
       - ./config/mediamtx.yml:/mediamtx.yml:ro
       - ./data/recordings:/recordings
-    networks:
-      - gharcam
 
   capture:
     image: ghcr.io/linuxserver/ffmpeg:latest
@@ -29,25 +24,21 @@ services:
     entrypoint: ["/usr/bin/bash", "-c"]
     command:
       - "exec /capture/capture.sh"
+    network_mode: host
     environment:
-      - TZ=Etc/UTC
-      - RTSP_URL=rtsp://mediamtx:8554/cam
-      - CAM_DEVICE=/dev/video0
-      - CAM_SIZE=1280x720
-      - CAM_FPS=12
-      - CAM_BITRATE=1600k
-      - CAM_PRESET=superfast
-      - OVERLAY_ENABLE=on
-      - OVERLAY_TEXT=gharcam
+      - TZ=${TZ:-UTC}
+      - RTSP_URL=rtsp://127.0.0.1:8554/cam
+      - CAM_DEVICE=${CAM_DEVICE:-/dev/video0}
+      - CAM_FORMAT=${CAM_FORMAT:-mjpeg}
+      - CAM_SIZE=${CAM_SIZE:-1280x720}
+      - CAM_FPS=${CAM_FPS:-12}
+      - CAM_BITRATE=${CAM_BITRATE:-1600k}
+      - CAM_PRESET=${CAM_PRESET:-superfast}
+      - OVERLAY_ENABLE=${OVERLAY_ENABLE:-on}
+      - OVERLAY_TEXT=${OVERLAY_TEXT:-gharcam}
     devices:
-      - "/dev/video0:/dev/video0:rwm"
+      - "${CAM_DEVICE:-/dev/video0}:${CAM_DEVICE:-/dev/video0}:rwm"
     volumes:
       - ./capture/capture.sh:/capture/capture.sh:ro
     depends_on:
       - mediamtx
-    networks:
-      - gharcam
-
-networks:
-  gharcam:
-    driver: bridge

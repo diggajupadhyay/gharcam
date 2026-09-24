@@ -1,9 +1,24 @@
 #!/usr/bin/env bash
-# Delete CCTV recordings strictly older than
-# RETENTION_HOURS hours (default 72). Run via user crontab every 6h.
+# Delete CCTV recordings strictly older than RETENTION_HOURS hours (default 72).
+# Reads RETENTION_HOURS from .env if present. Run via user crontab every 6h.
 set -u
-RETENTION_HOURS="${RETENTION_HOURS:-72}"
 BASE="$(cd "$(dirname "$0")" && pwd)"
+
+# Load .env (RETENTION_HOURS, etc.) without overriding already-set vars
+if [ -f "${BASE}/.env" ]; then
+  while IFS= read -r line; do
+    case "${line}" in
+      ''|'#'*) continue ;;
+      RETENTION_HOURS=*)
+        if [ -z "${RETENTION_HOURS:-}" ]; then
+          eval "${line}"
+        fi
+        ;;
+    esac
+  done < "${BASE}/.env"
+fi
+
+RETENTION_HOURS="${RETENTION_HOURS:-72}"
 MINUTES=$(( RETENTION_HOURS * 60 ))
 FIND_BIN="$(command -v find)"
 

@@ -1,6 +1,7 @@
 # Runtime data and generated/downloaded files — never commit
 data/
 config/default.yml
+.env
 *.log
 prune.log
 __pycache__/
