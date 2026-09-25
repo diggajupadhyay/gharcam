@@ -21,6 +21,7 @@ replacements = {
     "srt: true\n": "srt: false\n",
     "moq: true\n": "moq: false\n",
     "hlsVariant: lowLatency\n": "hlsVariant: mpegts\n",
+    "rpiCameraAfMode: continuous\n": "rpiCameraAfMode: manual\n",
     # For WebRTC behind NAT, set your public/LAN host here, e.g.:
     # 'webrtcAdditionalHosts: []\n': 'webrtcAdditionalHosts: ["192.168.1.50"]\n',
 }
