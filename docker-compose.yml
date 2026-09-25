@@ -17,6 +17,29 @@ services:
       - ./config/mediamtx.yml:/mediamtx.yml:ro
       - ./data/recordings:/recordings
 
+  camera-focus:
+    image: ghcr.io/linuxserver/ffmpeg:latest
+    container_name: gharcam-camera-focus
+    user: "0:0"
+    restart: "no"
+    entrypoint: ["/usr/bin/bash", "-c"]
+    command:
+      - |
+        export DEBIAN_FRONTEND=noninteractive
+        if ! command -v v4l2-ctl >/dev/null 2>&1; then
+          apt-get update -qq
+          apt-get install -y -qq --no-install-recommends v4l-utils
+        fi
+        if v4l2-ctl -d "$${CAM_DEVICE}" --set-ctrl=focus_automatic_continuous=0; then
+          printf '%s\n' '[camera-focus] autofocus disabled'
+        else
+          printf '%s\n' '[camera-focus] autofocus control unavailable'
+        fi
+    environment:
+      - CAM_DEVICE=${CAM_DEVICE:-/dev/video0}
+    devices:
+      - "${CAM_DEVICE:-/dev/video0}:${CAM_DEVICE:-/dev/video0}:rwm"
+
   capture:
     image: ghcr.io/linuxserver/ffmpeg:latest
     container_name: gharcam-capture
@@ -41,4 +64,7 @@ services:
     volumes:
       - ./capture/capture.sh:/capture/capture.sh:ro
     depends_on:
-      - mediamtx
+      mediamtx:
+        condition: service_started
+      camera-focus:
+        condition: service_completed_successfully
